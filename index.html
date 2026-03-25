@@ -3,26 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI 導盲犬：V44 跨平台行動版</title>
+    <title>AI 導盲犬</title>
     <style>
         /* 新增 touch-action: manipulation 防止手機雙擊放大 */
-        body { 
-            background-color: #0f172a; color: #f8fafc; font-family: '微軟正黑體', sans-serif; 
-            margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; 
-            /* 防止雙擊放大與瀏覽器預設手勢 */
-            touch-action: manipulation; 
-            -webkit-user-select: none; user-select: none; /* 防止反白文字 */
-        }
-        
-        /* 消除所有按鈕與搖桿的手機預設點擊高光 (反藍) */
-        * {
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        body { background-color: #0f172a; color: #f8fafc; font-family: '微軟正黑體', sans-serif; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
+        * { -webkit-tap-highlight-color: transparent; }
         h1 { color: #facc15; margin-bottom: 5px; font-size: 1.8rem; letter-spacing: 2px; text-align: center; }
         p { color: #94a3b8; font-size: 1rem; margin-bottom: 10px; text-align: center; }
         
-        /* 響應式容器設計 */
         #game-container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; align-items: center; }
         
         #dashboard { width: 100%; background: #1e293b; border: 3px solid #334155; border-radius: 20px 20px 0 0; padding: 10px 15px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); flex-wrap: wrap; gap: 10px; }
@@ -37,7 +25,6 @@
         
         #ai-log { color: #10b981; font-family: monospace; background: #020617; padding: 10px; border-radius: 10px; flex-grow: 1; text-align: left; font-size: 0.9rem; border-left: 5px solid #10b981; min-height: 40px; box-sizing: border-box; transition: 0.3s; }
         
-        /* 畫布響應式設定 */
         canvas { width: 100%; height: auto; max-height: 65vh; background-color: #334155; border: 3px solid #334155; border-top: none; border-radius: 0 0 20px 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); display: block; touch-action: none; }
         
         .btn-ai { background: #3b82f6; color: white; padding: 8px 15px; font-size: 1.1rem; border-radius: 10px; cursor: pointer; border:none; font-weight: bold; transition: 0.2s;}
@@ -57,21 +44,9 @@
         .btn-next { background: #10b981; } .btn-next:hover { background: #059669; }
         .btn-retry { background: #ef4444; } .btn-retry:hover { background: #b91c1c; }
 
-        /* ================= 虛擬搖桿 (Mobile 專用) ================= */
-        #virtual-joystick { 
-            display: none; flex-direction: column; align-items: center; margin-top: 10px; gap: 5px; 
-            touch-action: none; 
-            -webkit-touch-callout: none;
-        }
+        #virtual-joystick { display: none; flex-direction: column; align-items: center; margin-top: 10px; gap: 5px; touch-action: none; -webkit-touch-callout: none; }
         .dpad-row { display: flex; gap: 5px; justify-content: center; }
-        .dbtn { 
-            width: 65px; height: 65px; background: rgba(51, 65, 85, 0.9); border: 2px solid #475569; 
-            border-radius: 15px; font-size: 28px; color: white; display: flex; justify-content: center; 
-            align-items: center; cursor: pointer; transition: background 0.1s; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            -webkit-user-select: none; user-select: none; 
-            -webkit-tap-highlight-color: transparent;
-        }
+        .dbtn { width: 65px; height: 65px; background: rgba(51, 65, 85, 0.9); border: 2px solid #475569; border-radius: 15px; font-size: 28px; color: white; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: background 0.1s; box-shadow: 0 5px 15px rgba(0,0,0,0.5); -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
         .dbtn:active, .dbtn.active { background: #3b82f6; border-color: #60a5fa; transform: scale(0.92); }
         
         @media (max-width: 900px) {
@@ -105,8 +80,8 @@
         </div>
     </div>
 
-    <h1>🐕 AI 導盲犬：V44 跨平台行動版</h1>
-    <p>支援手機/平板觸控遊玩！行動裝置請使用下方虛擬搖桿操作。</p>
+    <h1>🐕 AI 導盲犬：V46 絕對防線版</h1>
+    <p>3、4 關加入「中央違停阻擋」，你無法再直直走了！請左右閃避或依賴 AI。</p>
     
     <div id="game-container">
         <div id="dashboard">
@@ -308,7 +283,6 @@ class Game {
     }
 
     initEvents() {
-        // 電腦實體鍵盤監聽
         window.addEventListener("keydown", e => { 
             this.keys[e.code] = true; 
             if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) e.preventDefault();
@@ -316,10 +290,9 @@ class Game {
         });
         window.addEventListener("keyup", e => this.keys[e.code] = false);
 
-        // 📱 觸控虛擬搖桿監聽 (Pointer Events 支援手機與滑鼠測試)
         document.querySelectorAll('.dbtn').forEach(btn => {
             btn.addEventListener('pointerdown', (e) => {
-                e.preventDefault(); // 防止畫面滑動
+                e.preventDefault(); 
                 btn.classList.add('active');
                 this.keys[btn.dataset.key] = true;
                 this.checkStartGame();
@@ -347,7 +320,6 @@ class Game {
 
     toggleAutoPilot() {
         this.checkStartGame();
-
         this.autoPilot = !this.autoPilot;
         const btn = document.getElementById("btn-autopilot");
         if (this.autoPilot) {
@@ -429,12 +401,13 @@ class Game {
                     this.createRandomCar(380, 1, null, true), this.createRandomCar(480, -1, null, true), 
                     this.createRandomCar(580, 1, null, true) 
                 ]; 
+                // 🛑 V46 修改：直接擋死正中央
                 this.obstacles = [ 
-                    new Obstacle(410, 250, 110, 50, 'parking'), 
-                    new Obstacle(560, 480, 110, 50, 'parking'), 
-                    new Obstacle(500, 350, 80, 40, 'puddle')    
+                    new Obstacle(490, 400, 110, 50, 'parking'), // 擋在正中間 (遮住導盲磚)
+                    new Obstacle(400, 250, 120, 50, 'parking'), // 擋在左側
+                    new Obstacle(560, 250, 80, 40, 'puddle')    
                 ]; 
-                this.log("Level 3: 下班尖峰時段，車流量變大，光線漸暗。", 'warn', true);
+                this.log("Level 3: 違停擋住導盲磚了！請左右閃避或啟動 AI。", 'warn', true);
                 this.isPlaying = true;
             } else if (lvl === 4) {
                 this.createRain();
@@ -443,11 +416,14 @@ class Game {
                     this.createRandomCar(320, 1, null, true), this.createRandomCar(400, -1, null, true), 
                     this.createRandomCar(520, 1, null, true), this.createRandomCar(600, -1, null, true) 
                 ];
+                // 🛑 V46 修改：連續 S 型阻擋
                 this.obstacles = [ 
-                    new Obstacle(400, 200, 110, 60, 'parking'), new Obstacle(570, 400, 100, 50, 'parking'), 
-                    new Obstacle(480, 300, 80, 40, 'puddle'), new Obstacle(520, 550, 80, 40, 'puddle') 
+                    new Obstacle(510, 480, 120, 60, 'parking'), // 擋在正中間偏右
+                    new Obstacle(380, 320, 140, 50, 'parking'), // 擋左邊，逼你往右
+                    new Obstacle(490, 180, 110, 50, 'parking'), // 再擋回正中間
+                    new Obstacle(450, 400, 100, 50, 'puddle') 
                 ]; 
-                this.log("Level 4: 視線不良加上陣雨。機車大軍出現，建議使用 AI 輔助。", 'error', true);
+                this.log("Level 4: 視線不良加連續違停！請謹慎走位或啟動 AI。", 'error', true);
                 this.isPlaying = true;
             } else if (lvl === 5) {
                 this.createRain();
@@ -458,13 +434,13 @@ class Game {
                     this.createRandomCar(590, -1, null, true)
                 ];
                 this.obstacles = [ 
-                    new Obstacle(400, 180, 110, 50, 'parking'), 
-                    new Obstacle(555, 320, 120, 50, 'parking'), 
-                    new Obstacle(390, 500, 110, 50, 'parking'), 
-                    new Obstacle(530, 250, 70, 40, 'puddle'),   
-                    new Obstacle(480, 420, 70, 40, 'puddle')    
+                    new Obstacle(490, 200, 120, 50, 'parking'), 
+                    new Obstacle(400, 350, 120, 50, 'parking'), 
+                    new Obstacle(560, 500, 120, 50, 'parking'), 
+                    new Obstacle(530, 280, 80, 40, 'puddle'),   
+                    new Obstacle(480, 420, 80, 40, 'puddle')    
                 ]; 
-                this.log("Level 5 (Final): 終極暴雨路口！車道高密度壓縮，請冷靜通過。", 'error', true);
+                this.log("Level 5 (Final): 終極暴雨路口！違停佔用斑馬線，請冷靜繞行。", 'error', true);
                 this.isPlaying = true;
             }
 
@@ -536,13 +512,12 @@ class Game {
         let dogCenter = this.dog.x + this.dog.w / 2;
         let targetX = CONFIG.CROSSWALK_CENTER_X; 
 
-        // 🌟 修正 AI 邏輯：如果在起點安全區，才遵守紅燈停看聽
         if (this.pedState === "RED" && this.dog.y >= 680) {
             let moveX = 0;
             if (dogCenter < targetX - 2) moveX = 1.0; 
             else if (dogCenter > targetX + 2) moveX = -1.0;
             this.log("🐕 [AI] 紅燈停看聽，等待綠燈亮起...", "warn", false);
-            return { x: moveX, y: 0 }; // 確保 Y 軸不移動 (不會卡死，也不會闖紅燈)
+            return { x: moveX, y: 0 }; 
         }
 
         for (let car of this.cars) {
@@ -567,13 +542,13 @@ class Game {
         let maxClearance = -1;
         let bestLanes = [];
 
-        for (let scanX = 450; scanX <= 620; scanX += 5) {
+        for (let scanX = 400; scanX <= 670; scanX += 10) {
             let clearance = 9999;
             for (let obs of this.obstacles) {
                 if (obs.type !== 'parking') continue;
                 let distY = this.dog.y - (obs.y + obs.h);
                 if (distY > -30 && distY < 250) {
-                    if (scanX + 12 > obs.x && scanX - 12 < obs.x + obs.w) {
+                    if (scanX + 18 > obs.x && scanX - 18 < obs.x + obs.w) {
                         if (distY < clearance) clearance = distY;
                     }
                 }
@@ -587,23 +562,23 @@ class Game {
 
         if (bestLanes.length > 0) {
             let centerLane = CONFIG.CROSSWALK_CENTER_X;
-            let isCenterSafe = bestLanes.some(l => Math.abs(l - centerLane) <= 5);
+            let isCenterSafe = bestLanes.some(l => Math.abs(l - centerLane) <= 10);
             
-            if (isCenterSafe && maxClearance > 120) { targetX = centerLane; } 
+            if (isCenterSafe && maxClearance > 100) { targetX = centerLane; } 
             else {
                 bestLanes.sort((a, b) => Math.abs(a - dogCenter) - Math.abs(b - dogCenter));
                 targetX = bestLanes[0];
             }
         }
 
-        targetX = Math.max(450, Math.min(620, targetX));
+        targetX = Math.max(400, Math.min(670, targetX));
 
         let currentClearance = 9999;
         for (let obs of this.obstacles) {
             if (obs.type !== 'parking') continue;
             let distY = this.dog.y - (obs.y + obs.h);
-            if (distY > -10 && distY < 200) {
-                if (dogCenter + 12 > obs.x && dogCenter - 12 < obs.x + obs.w) {
+            if (distY > -30 && distY < 250) {
+                if (dogCenter + 15 > obs.x && dogCenter - 15 < obs.x + obs.w) {
                     if (distY < currentClearance) currentClearance = distY;
                 }
             }
@@ -613,12 +588,13 @@ class Game {
         if (this.dog.y > 15) {
             let diff = Math.abs(dogCenter - targetX);
             
-            if (dogCenter < targetX - 2) moveX = 1.0; 
-            else if (dogCenter > targetX + 2) moveX = -1.0;
+            if (dogCenter < targetX - 3) moveX = 1.0; 
+            else if (dogCenter > targetX + 3) moveX = -1.0;
             
-            if (diff > 3) {
-                if (currentClearance < 45) moveY = 0; 
-                else moveY = -0.2; 
+            if (diff > 5) {
+                if (currentClearance < 50) { moveY = 0; } 
+                else if (currentClearance < 80) { moveY = -0.3; this.log("🐕 [AI] 偵測到違停路障，重新規劃安全路徑繞行...", "warn", false); }
+                else { moveY = -0.8; }
             }
             return { x: moveX, y: moveY }; 
         }
@@ -654,7 +630,6 @@ class Game {
             if (this.keys["ArrowLeft"] || this.keys["KeyA"]) moveX = -1;
             if (this.keys["ArrowRight"] || this.keys["KeyD"]) moveX = 1;
 
-            // 🌟 修正手動邏輯：只有在起點安全區 (y >= 680)，紅燈時才拒絕進入車道
             if (moveY < 0 && this.pedState === "RED" && this.dog.y >= 680) {
                 this.log("🐕 [智慧違抗] 現在是紅燈，拒絕進入車道！", "error", true);
                 moveY = 0; 
@@ -752,7 +727,6 @@ class Game {
         this.ctx.strokeStyle = "#a1a1aa"; this.ctx.lineWidth = 4; this.ctx.beginPath();
         this.ctx.moveTo(this.owner.x + 20, this.owner.y + 15); this.ctx.lineTo(this.dog.x + 15, this.dog.y + 20); this.ctx.stroke();
 
-        // ⚠️ 在這邊畫上你美美的圖片！
         this.ctx.font = "40px Arial"; this.ctx.fillText("🧑‍🦯", this.owner.x, this.owner.y + 35);
         this.ctx.font = "35px Arial"; this.ctx.fillText("🐕", this.dog.x, this.dog.y + 30);
 
