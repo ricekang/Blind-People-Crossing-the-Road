@@ -5,8 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AI 導盲犬：V44 跨平台行動版</title>
     <style>
-        /* 新增 touch-action: none 防止手機滑動時畫面跟著拉扯 */
-        body { background-color: #0f172a; color: #f8fafc; font-family: '微軟正黑體', sans-serif; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; touch-action: manipulation; }
+        /* 新增 touch-action: manipulation 防止手機雙擊放大 */
+        body { 
+            background-color: #0f172a; color: #f8fafc; font-family: '微軟正黑體', sans-serif; 
+            margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; 
+            /* 防止雙擊放大與瀏覽器預設手勢 */
+            touch-action: manipulation; 
+            -webkit-user-select: none; user-select: none; /* 防止反白文字 */
+        }
+        
+        /* 消除所有按鈕與搖桿的手機預設點擊高光 (反藍) */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
         h1 { color: #facc15; margin-bottom: 5px; font-size: 1.8rem; letter-spacing: 2px; text-align: center; }
         p { color: #94a3b8; font-size: 1rem; margin-bottom: 10px; text-align: center; }
         
@@ -25,8 +37,8 @@
         
         #ai-log { color: #10b981; font-family: monospace; background: #020617; padding: 10px; border-radius: 10px; flex-grow: 1; text-align: left; font-size: 0.9rem; border-left: 5px solid #10b981; min-height: 40px; box-sizing: border-box; transition: 0.3s; }
         
-        /* 畫布響應式設定：保持內部 1100x800 座標，但視覺上自適應螢幕寬度 */
-        canvas { width: 100%; height: auto; max-height: 75vh; background-color: #334155; border: 3px solid #334155; border-top: none; border-radius: 0 0 20px 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); display: block; touch-action: none; }
+        /* 畫布響應式設定 */
+        canvas { width: 100%; height: auto; max-height: 65vh; background-color: #334155; border: 3px solid #334155; border-top: none; border-radius: 0 0 20px 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); display: block; touch-action: none; }
         
         .btn-ai { background: #3b82f6; color: white; padding: 8px 15px; font-size: 1.1rem; border-radius: 10px; cursor: pointer; border:none; font-weight: bold; transition: 0.2s;}
         .btn-ai:hover { background: #2563eb; transform: scale(1.05); }
@@ -46,17 +58,33 @@
         .btn-retry { background: #ef4444; } .btn-retry:hover { background: #b91c1c; }
 
         /* ================= 虛擬搖桿 (Mobile 專用) ================= */
-        #virtual-joystick { display: none; flex-direction: column; align-items: center; margin-top: 15px; gap: 5px; touch-action: none; user-select: none; }
+        #virtual-joystick { 
+            display: none; flex-direction: column; align-items: center; margin-top: 10px; gap: 5px; 
+            /* 徹底防止搖桿區塊的預設觸控行為 (滑動、雙擊放大等) */
+            touch-action: none; 
+            -webkit-touch-callout: none;
+        }
         .dpad-row { display: flex; gap: 5px; justify-content: center; }
-        .dbtn { width: 60px; height: 60px; background: rgba(51, 65, 85, 0.8); border: 2px solid #475569; border-radius: 15px; font-size: 24px; color: white; display: flex; justify-content: center; align-items: center; user-select: none; cursor: pointer; transition: background 0.1s; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .dbtn:active, .dbtn.active { background: #3b82f6; border-color: #60a5fa; transform: scale(0.95); }
+        .dbtn { 
+            width: 65px; height: 65px; background: rgba(51, 65, 85, 0.9); border: 2px solid #475569; 
+            border-radius: 15px; font-size: 28px; color: white; display: flex; justify-content: center; 
+            align-items: center; cursor: pointer; transition: background 0.1s; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            /* 確保按鈕本身不會被選取或反藍 */
+            -webkit-user-select: none; user-select: none; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        .dbtn:active, .dbtn.active { background: #3b82f6; border-color: #60a5fa; transform: scale(0.92); }
         
         /* 當螢幕寬度小於 900px 時，顯示虛擬搖桿並微調排版 */
         @media (max-width: 900px) {
             #virtual-joystick { display: flex; }
-            h1 { font-size: 1.4rem; }
-            #dashboard { flex-direction: column; align-items: center; border-radius: 10px 10px 0 0; }
+            h1 { font-size: 1.3rem; margin-bottom: 2px;}
+            p { font-size: 0.85rem; margin-bottom: 5px;}
+            #dashboard { flex-direction: column; align-items: center; border-radius: 10px 10px 0 0; padding: 8px;}
             #ai-log { width: 100%; text-align: center; }
+            /* 手機版將畫布稍微縮小，留出更多空間給搖桿 */
+            canvas { max-height: 50vh; }
         }
     </style>
 </head>
