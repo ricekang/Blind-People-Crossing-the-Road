@@ -3,139 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>AI 導盲犬：V45 專業行動優化版</title>
+    <title>AI 導盲犬：V46 終極完全體</title>
     <style>
-        /* 💡 V45 核心：封印所有手機瀏覽器的干擾行為 */
+        /* 💡 核心手機優化：封印反藍與縮放，其餘視覺完全保留 */
         * {
-            -webkit-tap-highlight-color: transparent; /* 移除點擊時的灰色陰影 */
-            -webkit-touch-callout: none;                /* 禁止長按彈出選單 */
-            -webkit-user-select: none;                  /* 禁止選取文字 */
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
             user-select: none; 
-            touch-action: manipulation;                 /* 優化點擊延遲 */
+            touch-action: manipulation;
         }
 
-        body { 
-            background-color: #0f172a; 
-            color: #f8fafc; 
-            font-family: '微軟正黑體', sans-serif; 
-            margin: 0; 
-            padding: 10px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center;
-            overflow-x: hidden; /* 防止橫向滾動 */
-        }
+        body { background-color: #0f172a; color: #f8fafc; font-family: '微軟正黑體', sans-serif; margin: 0; padding: 15px 10px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+        h1 { color: #facc15; margin-bottom: 5px; font-size: 1.8rem; letter-spacing: 2px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        p { color: #94a3b8; font-size: 1rem; margin-bottom: 10px; }
 
-        h1 { color: #facc15; margin-bottom: 5px; font-size: 1.6rem; letter-spacing: 1px; text-align: center; }
-        p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 10px; text-align: center; }
+        #game-container { width: 100%; max-width: 1100px; position: relative; }
         
-        #game-container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; align-items: center; }
+        #dashboard { width: 100%; background: #1e293b; border: 3px solid #334155; border-radius: 20px 20px 0 0; padding: 10px 20px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); flex-wrap: wrap; gap: 10px;}
         
-        #dashboard { width: 100%; background: #1e293b; border: 3px solid #334155; border-radius: 20px 20px 0 0; padding: 10px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; gap: 5px; flex-wrap: nowrap; }
+        .signal-panel { display: flex; gap: 12px; background: #020617; padding: 10px; border-radius: 15px; border: 2px solid #475569; }
+        .signal-box { display: flex; flex-direction: column; align-items: center; background: #1e293b; padding: 5px; border-radius: 10px; min-width: 100px; }
+        .signal-title { font-size: 0.9rem; color: #94a3b8; margin-bottom: 3px; font-weight: bold; }
+        .signal-light { font-size: 1.3rem; font-weight: 900; padding: 5px; border-radius: 8px; background: #000; width: 100%; text-align: center; }
         
-        .signal-panel { display: flex; gap: 5px; background: #020617; padding: 5px; border-radius: 12px; border: 1px solid #475569; }
-        .signal-box { display: flex; flex-direction: column; align-items: center; background: #1e293b; padding: 3px; border-radius: 8px; min-width: 80px; }
-        .signal-title { font-size: 0.75rem; color: #94a3b8; margin-bottom: 2px; }
-        .signal-light { font-size: 1rem; font-weight: 900; padding: 3px; border-radius: 5px; background: #000; width: 100%; text-align: center; }
-        
-        #ai-log { color: #10b981; font-family: monospace; background: #020617; padding: 8px; border-radius: 8px; flex-grow: 1; font-size: 0.8rem; border-left: 4px solid #10b981; min-height: 35px; }
-        
-        canvas { 
-            width: 100%; 
-            height: auto; 
-            background-color: #334155; 
-            border: 3px solid #334155; 
-            border-top: none; 
-            border-radius: 0 0 20px 20px; 
-            display: block; 
-            touch-action: none; /* 💡 關鍵：禁止畫布上的所有預設手勢（縮放、滾動） */
-        }
-        
-        .btn-ai { background: #3b82f6; color: white; padding: 8px 12px; font-size: 1rem; border-radius: 10px; cursor: pointer; border:none; font-weight: bold; }
+        .ped-red { color: #ef4444; border-bottom: 3px solid #ef4444; } .ped-green { color: #10b981; border-bottom: 3px solid #10b981; }
+        .car-red { color: #ef4444; border-bottom: 3px solid #ef4444; } .car-green { color: #10b981; border-bottom: 3px solid #10b981; }
 
-        /* ================= 虛擬搖桿優化 ================= */
-        #virtual-joystick { 
-            display: none; 
-            flex-direction: column; 
-            align-items: center; 
-            margin-top: 10px; 
-            gap: 8px; 
-            width: 100%;
-            touch-action: none; /* 💡 關鍵：按鈕絕對禁止觸發縮放 */
-        }
-        .dpad-row { display: flex; gap: 15px; justify-content: center; }
-        .dbtn { 
-            width: 70px; 
-            height: 70px; 
-            background: rgba(51, 65, 85, 0.9); 
-            border: 2px solid #475569; 
-            border-radius: 20px; 
-            font-size: 28px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-            touch-action: none; /* 再次強調禁止縮放 */
-        }
-        .dbtn:active { background: #3b82f6; transform: scale(0.92); }
+        #ai-log { color: #10b981; font-family: monospace; background: #020617; padding: 15px; border-radius: 10px; flex-grow: 1; min-width: 300px; border-left: 5px solid #10b981; min-height: 50px; font-size: 0.95rem; }
+
+        canvas { width: 100%; height: auto; background-color: #334155; border: 3px solid #334155; border-top: none; border-radius: 0 0 20px 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); display: block; touch-action: none; }
+
+        .btn-ai { background: #3b82f6; color: white; padding: 10px 20px; font-size: 1.2rem; border-radius: 12px; cursor: pointer; border:none; font-weight: bold; transition: 0.2s; box-shadow: 0 4px 0 #1d4ed8; }
+        .btn-ai:active { transform: translateY(2px); box-shadow: 0 2px 0 #1d4ed8; }
+
+        /* 虛擬搖桿 - 手機顯示，電腦隱藏 */
+        #mobile-controls { display: none; margin-top: 20px; width: 100%; justify-content: center; gap: 20px; align-items: center; }
+        .dpad { display: grid; grid-template-areas: ". up ." "left down right"; gap: 10px; }
+        .dbtn { width: 75px; height: 75px; background: rgba(51, 65, 85, 0.9); border: 2px solid #475569; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 30px; color: white; box-shadow: 0 6px 15px rgba(0,0,0,0.5); touch-action: none; }
+        .dbtn:active { background: #3b82f6; transform: scale(0.9); }
         
         @media (max-width: 900px) {
-            #virtual-joystick { display: flex; }
-            #dashboard { flex-wrap: wrap; justify-content: center; }
+            #mobile-controls { display: flex; }
+            h1 { font-size: 1.4rem; }
+            #dashboard { flex-direction: column; }
         }
 
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(4px); }
-        .modal { background: #1e293b; padding: 25px; border-radius: 20px; text-align: center; max-width: 85%; border: 2px solid #38bdf8; }
+        /* 結算畫面樣式恢復 */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(5px); color:white; }
+        .modal { background: #1e293b; padding: 40px; border-radius: 30px; text-align: center; border: 2px solid #38bdf8; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
     </style>
 </head>
-<body oncontextmenu="return false;"> <div id="win-overlay" class="overlay">
+<body oncontextmenu="return false;">
+
+    <div id="win-overlay" class="overlay">
         <div class="modal">
-            <h2 style="color:#facc15; font-size:2rem;">🎉 任務完成！</h2>
-            <div id="rank-text" style="font-size:4rem; font-weight:900;">S</div>
-            <div style="background:#0f172a; padding:10px; border-radius:10px; margin:10px 0; text-align:left; font-size:0.9rem;">
-                ⏱️ 耗時：<span id="stat-time"></span><br>
-                🏆 得分：<span id="stat-score"></span>
+            <h2 style="color:#facc15; font-size:3rem; margin:0;">關卡完成！</h2>
+            <div id="rank-display" style="font-size:6rem; font-weight:900; color:#38bdf8;">S</div>
+            <div style="background:#020617; padding:20px; border-radius:15px; margin:20px 0; text-align:left; font-family:monospace; font-size:1.2rem;">
+                ⏱️ 通關耗時：<span id="stat-time">0</span> 秒<br>
+                🏆 綜合得分：<span id="stat-score">0</span>
             </div>
-            <button class="btn-ai" style="background:#10b981; padding:15px 30px;" onclick="window.game.nextLevel()">下一關</button>
+            <button class="btn-ai" style="background:#10b981; padding:15px 40px; font-size:1.5rem;" onclick="window.game.nextLevel()">進入下一關</button>
         </div>
     </div>
 
-    <div id="death-overlay" class="overlay">
+    <div id="death-overlay" class="overlay" style="background:rgba(127,29,29,0.8);">
         <div class="modal" style="border-color:#ef4444;">
-            <h2 style="color:#fca5a5;">💥 發生事故</h2>
-            <p>請重新觀察車流規律...</p>
-            <button class="btn-ai" style="background:#ef4444; padding:15px 30px;" onclick="window.game.restartLevel()">重新挑戰</button>
+            <h2 style="color:#fca5a5; font-size:3rem;">💥 發生事故</h2>
+            <p style="font-size:1.2rem;">即使 AI 盡力迴避，仍無法跨越物理極限。</p>
+            <button class="btn-ai" style="background:#ef4444; padding:15px 40px;" onclick="window.game.restartLevel()">重新挑戰</button>
         </div>
     </div>
 
-    <h1>🐕 AI 導盲犬：V45 專業行動優化</h1>
+    <h1>🐕 AI 導盲犬：V46 終極完全體</h1>
     
     <div id="game-container">
         <div id="dashboard">
             <div style="display: flex; flex-direction: column; align-items: center;">
-                <div id="level-display" style="color: #38bdf8; font-size: 1.1rem; font-weight: bold;">關卡 1</div>
-                <button type="button" id="btn-autopilot" class="btn-ai" onclick="window.game.toggleAutoPilot()">🤖 AI</button>
+                <div id="level-display" style="color: #38bdf8; font-size: 1.5rem; font-weight: 900; margin-bottom:5px;">關卡 1 / 5</div>
+                <button type="button" id="btn-autopilot" class="btn-ai" onclick="window.game.toggleAutoPilot()">🤖 啟動 AI 導盲</button>
             </div>
-            <div id="ai-log">系統已就緒，請操作虛擬搖桿開始。</div>
+            <div id="ai-log">[SYS] 系統已就緒。手機玩家請使用下方搖桿，電腦玩家請用 WASD。</div>
             <div class="signal-panel">
-                <div class="signal-box"><div class="signal-light ped-red" id="ped-ui">🔴</div></div>
-                <div class="signal-box"><div class="signal-light car-green" id="car-ui">🟢</div></div>
+                <div class="signal-box"><div class="signal-title">🚶 行人號誌</div><div class="signal-light ped-red" id="ped-ui">🔴 停止</div></div>
+                <div class="signal-box"><div class="signal-title">🚗 車道號誌</div><div class="signal-light car-green" id="car-ui">🟢 通行</div></div>
             </div>
         </div>
         <canvas id="gameCanvas" width="1100" height="800"></canvas>
     </div>
 
-    <div id="virtual-joystick">
-        <div class="dpad-row"><div class="dbtn" data-key="ArrowUp">⬆️</div></div>
-        <div class="dpad-row">
-            <div class="dbtn" data-key="ArrowLeft">⬅️</div>
-            <div class="dbtn" data-key="ArrowDown">⬇️</div>
-            <div class="dbtn" data-key="ArrowRight">➡️</div>
+    <div id="mobile-controls">
+        <div class="dpad">
+            <div class="dbtn" style="grid-area: up" data-key="ArrowUp">⬆️</div>
+            <div class="dbtn" style="grid-area: left" data-key="ArrowLeft">⬅️</div>
+            <div class="dbtn" style="grid-area: down" data-key="ArrowDown">⬇️</div>
+            <div class="dbtn" style="grid-area: right" data-key="ArrowRight">➡️</div>
         </div>
     </div>
 
 <script>
-// ============ 遊戲程式碼開始 (同 V43 邏輯，但增加觸控優化) ============
+// ==========================================
+// 核心遊戲邏輯 (恢復 V43 所有細節)
+// ==========================================
 const CONFIG = {
     CANVAS_W: 1100, CANVAS_H: 800,
     ROAD_TOP: 140, ROAD_BOTTOM: 680,
@@ -147,6 +117,7 @@ const CONFIG = {
 
 const CAR_COLORS = ['#ef4444', '#38bdf8', '#facc15', '#a855f7', '#10b981', '#f97316', '#cbd5e1'];
 
+// 音效引擎
 class AudioEngine {
     constructor() { this.ctx = null; this.isInit = false; this.rainGain = null; this.lastBeepTime = 0; }
     init() {
@@ -192,7 +163,6 @@ const audioSys = new AudioEngine();
 
 class GameObject {
     constructor(x, y, w, h, color) { this.x = x; this.y = y; this.w = w; this.h = h; this.color = color; }
-    isColliding(other) { return this.x < other.x + other.w && this.x + this.w > other.x && this.y < other.y + other.h && this.y + this.h > other.y; }
 }
 
 class Obstacle extends GameObject {
@@ -206,8 +176,8 @@ class Obstacle extends GameObject {
 
 class Car extends GameObject {
     constructor(x, y, speed, dir, color, obey, isScooter = false) {
-        let w = isScooter ? 60 : 130 + Math.random() * 30; let h = isScooter ? 35 : 70;
-        super(x, y, w, h, color);
+        let cw = isScooter ? 60 : 130 + Math.random() * 30; let ch = isScooter ? 35 : 70;
+        super(x, y, cw, ch, color);
         this.dir = dir; this.baseSpeed = isScooter ? speed * 1.3 : speed; this.currentSpeed = this.baseSpeed; 
         this.obey = obey; this.isScooter = isScooter; this.violating = false;
         this.brakePower = (Math.random() < 0.4) ? (10 + Math.random()*15) : 120; 
@@ -221,11 +191,11 @@ class Car extends GameObject {
         this.isPanicBraking = false; this.isYielding = false; 
 
         let pedMinY = Math.min(dog.y, owner.y);
-        let pedMaxY = Math.max(dog.y + dog.h, owner.y + owner.h);
+        let pedMaxY = Math.max(dog.y + 30, owner.y + 40);
         let inLane = (this.y + this.h > pedMinY - 45) && (this.y < pedMaxY + 45);
         let onRoad = dog.y > 100 && dog.y < 680;
         let pedMinX = Math.min(dog.x, owner.x);
-        let pedMaxX = Math.max(dog.x + dog.w, owner.x + owner.w);
+        let pedMaxX = Math.max(dog.x + 30, owner.x + 40);
         let frontDist = (this.dir === 1) ? (pedMinX - (this.x + this.w)) : (this.x - pedMaxX);
         
         let blockedByPedestrian = (onRoad && inLane && frontDist > -40 && frontDist < 300);
@@ -256,7 +226,7 @@ class Car extends GameObject {
 
         if (this.violating && frontDist > 0 && frontDist < 400 && onRoad) { audioSys.play3DWarning(this.x, dog.x); }
 
-        let distCenter = Math.sqrt(Math.pow((this.x+this.w/2) - (dog.x+dog.w/2), 2) + Math.pow((this.y+this.h/2) - (dog.y+dog.h/2), 2));
+        let distCenter = Math.sqrt(Math.pow((this.x+this.w/2) - (dog.x+15), 2) + Math.pow((this.y+this.h/2) - (dog.y+15), 2));
         if (distCenter < 90 && this.currentSpeed > 5 && !this.nearMissScored) { this.nearMissScored = true; return true; }
 
         if ((this.dir === 1 && this.x > 1200) || (this.dir === -1 && this.x < -200)) {
@@ -292,113 +262,69 @@ class Game {
         this.isPlaying = false; this.lastTime = 0;
         this.loopStarted = false; this.isDead = false;
         this.cycleTimer = 0; this.pedState = "RED"; this.carState = "GREEN";
-        this.dog = { x: CONFIG.CROSSWALK_CENTER_X - 15, y: 720, w: 30, h: 30, speed: 130, slowed: false, onTactile: true };
+        
+        this.dog = { x: CONFIG.CROSSWALK_CENTER_X - 15, y: 720, w: 30, h: 30, speed: 130, onTactile: true };
         this.owner = { x: CONFIG.CROSSWALK_CENTER_X - 20, y: 760, w: 40, h: 40 }; 
         this.cars = []; this.obstacles = []; this.keys = {}; this.autoPilot = false;
-        this.isEmergencyPullback = false; 
-        this.stats = { startTime: 0, nearMisses: 0 };
+        this.isEmergencyPullback = false; this.stats = { startTime: 0, nearMisses: 0 };
         this.rainParticles = [];
         this.initEvents();
         this.startLevel(1);
     }
 
     initEvents() {
-        // 電腦實體鍵盤
-        window.addEventListener("keydown", e => { 
-            this.keys[e.code] = true; 
-            if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) e.preventDefault();
-            this.checkStart();
-        });
+        window.addEventListener("keydown", e => { this.keys[e.code] = true; if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.code)) e.preventDefault(); this.checkStart(); });
         window.addEventListener("keyup", e => this.keys[e.code] = false);
 
-        // 📱 手機虛擬搖桿 (支援 Pointer Events 防止縮放與反藍)
         document.querySelectorAll('.dbtn').forEach(btn => {
-            btn.addEventListener('pointerdown', (e) => {
-                e.preventDefault();
-                this.keys[btn.dataset.key] = true;
-                this.checkStart();
-            });
+            btn.addEventListener('pointerdown', (e) => { e.preventDefault(); this.keys[btn.dataset.key] = true; this.checkStart(); });
             btn.addEventListener('pointerup', (e) => { e.preventDefault(); this.keys[btn.dataset.key] = false; });
             btn.addEventListener('pointercancel', (e) => { e.preventDefault(); this.keys[btn.dataset.key] = false; });
         });
     }
 
-    checkStart() {
-        if(!this.isPlaying && this.level === 1 && !this.isDead) {
-            audioSys.init(); this.isPlaying = true; this.stats.startTime = Date.now();
-        }
-    }
+    checkStart() { if(!this.isPlaying && this.level === 1 && !this.isDead) { audioSys.init(); this.isPlaying = true; this.stats.startTime = Date.now(); } }
 
     toggleAutoPilot() {
-        this.checkStart();
-        this.autoPilot = !this.autoPilot;
+        this.checkStart(); this.autoPilot = !this.autoPilot;
         const btn = document.getElementById("btn-autopilot");
-        if (this.autoPilot) {
-            btn.style.background = "#10b981"; btn.innerText = "✅ ON";
-            this.log("🤖 [AI] 防護已啟動，紅燈將自動等待。", "success", true);
-        } else {
-            btn.style.background = "#3b82f6"; btn.innerText = "🤖 OFF";
-            this.log("🤖 [AI] 切換為手動模式。", "warn", true);
-        }
+        if (this.autoPilot) { btn.style.background = "#10b981"; btn.innerText = "✅ ON"; this.log("🤖 [AI] 防護系統已連線。", "success", true); }
+        else { btn.style.background = "#3b82f6"; btn.innerText = "🤖 OFF"; this.log("🤖 [AI] 手動模式。", "warn", true); }
     }
 
     log(msg, type = 'info', speak = false) {
         const el = document.getElementById("ai-log");
-        if(el.innerText === msg) return; 
-        el.innerText = msg;
+        if(el.innerText === msg) return; el.innerText = msg;
         el.style.color = type === 'error' ? '#ef4444' : type === 'warn' ? '#facc15' : '#10b981';
         if (speak && 'speechSynthesis' in window) {
             window.speechSynthesis.cancel(); 
-            let cleanText = msg.replace(/\[.*?\]/g, '').trim();
-            let utterance = new SpeechSynthesisUtterance(cleanText);
+            let utterance = new SpeechSynthesisUtterance(msg.replace(/\[.*?\]/g, ''));
             utterance.lang = 'zh-TW'; utterance.rate = 1.3; window.speechSynthesis.speak(utterance);
         }
     }
 
-    createRandomCar(y, dir, enforceObey = null, allowScooter = false) {
-        let speed = 6 + Math.random() * 5; let obey = enforceObey !== null ? enforceObey : Math.random() > 0.45;
-        let color = CAR_COLORS[Math.floor(Math.random() * CAR_COLORS.length)]; let isScooter = allowScooter ? (Math.random() < 0.35) : false; 
-        let startX = (dir === 1) ? -200 - Math.random()*400 : 1200 + Math.random()*400;
-        return new Car(startX, y, speed, dir, color, obey, isScooter);
-    }
-
-    createRain() {
-        this.rainParticles = [];
-        for(let i=0; i<150; i++) this.rainParticles.push({ x: Math.random()*1100, y: Math.random()*800, s: 15+Math.random()*15, l: 10+Math.random()*20 });
-    }
-
     startLevel(lvl) {
         this.level = lvl;
-        document.getElementById("level-display").innerText = `關卡 ${lvl}`;
-        document.getElementById("win-overlay").style.display = "none"; 
-        document.getElementById("death-overlay").style.display = "none"; 
-        this.dog.x = CONFIG.CROSSWALK_CENTER_X - 15; this.dog.y = 720; 
-        this.owner.x = CONFIG.CROSSWALK_CENTER_X - 20; this.owner.y = 760;
+        document.getElementById("level-display").innerText = `關卡 ${lvl} / 5`;
+        document.getElementById("win-overlay").style.display = "none"; document.getElementById("death-overlay").style.display = "none"; 
+        this.dog.x = CONFIG.CROSSWALK_CENTER_X - 15; this.dog.y = 720; this.owner.x = CONFIG.CROSSWALK_CENTER_X - 20; this.owner.y = 760;
         this.cycleTimer = 0; this.autoPilot = false; this.isDead = false; this.keys = {}; 
         this.stats = { startTime: Date.now(), nearMisses: 0 }; 
         audioSys.setRainVolume(lvl); this.rainParticles = [];
 
-        if (lvl === 1) {
-            this.obstacles = []; this.cars = [ this.createRandomCar(180, 1, true), this.createRandomCar(320, -1, true) ];
-            this.isPlaying = false; 
-        } else if (lvl === 2) {
-            this.cars = [ this.createRandomCar(180, 1, null, true), this.createRandomCar(320, -1, null, false), this.createRandomCar(460, 1, null, true) ]; 
-            this.obstacles = [ new Obstacle(390, 450, 120, 50, 'parking'), new Obstacle(560, 300, 80, 40, 'puddle') ]; 
-            this.isPlaying = true;
-        } else if (lvl === 3) {
-            this.cars = [ this.createRandomCar(180, 1, null, true), this.createRandomCar(280, -1, null, true), this.createRandomCar(380, 1, null, true), this.createRandomCar(480, -1, null, true), this.createRandomCar(580, 1, null, true) ]; 
+        if (lvl === 1) { this.obstacles = []; this.cars = [ new Car(-200, 180, 7, 1, '#ef4444', true), new Car(1200, 320, 8, -1, '#38bdf8', true) ]; }
+        else if (lvl === 2) { this.cars = [ new Car(-200, 180, 8, 1, '#ef4444', true), new Car(1200, 320, 7, -1, '#38bdf8', true), new Car(-300, 460, 9, 1, '#facc15', true) ]; this.obstacles = [ new Obstacle(390, 450, 120, 50, 'parking'), new Obstacle(560, 300, 80, 40, 'puddle') ]; }
+        else if (lvl === 3) { 
+            this.cars = [ new Car(-200, 180, 8, 1, '#ef4444', false), new Car(1200, 280, 7, -1, '#38bdf8', true), new Car(-400, 380, 9, 1, '#facc15', true), new Car(1300, 480, 8, -1, '#a855f7', true), new Car(-200, 580, 7, 1, '#10b981', true) ];
             this.obstacles = [ new Obstacle(410, 250, 110, 50, 'parking'), new Obstacle(560, 480, 110, 50, 'parking'), new Obstacle(500, 350, 80, 40, 'puddle') ]; 
-            this.isPlaying = true;
-        } else if (lvl === 4) {
-            this.createRain();
-            this.cars = [ this.createRandomCar(160, 1, null, true), this.createRandomCar(240, -1, null, true), this.createRandomCar(320, 1, null, true), this.createRandomCar(400, -1, null, true), this.createRandomCar(520, 1, null, true), this.createRandomCar(600, -1, null, true) ];
-            this.obstacles = [ new Obstacle(400, 200, 110, 60, 'parking'), new Obstacle(570, 400, 100, 50, 'parking'), new Obstacle(480, 300, 80, 40, 'puddle'), new Obstacle(520, 550, 80, 40, 'puddle') ]; 
-            this.isPlaying = true;
-        } else if (lvl === 5) {
-            this.createRain();
-            this.cars = [ this.createRandomCar(150, 1, null, true), this.createRandomCar(220, 1, null, true), this.createRandomCar(290, -1, null, true), this.createRandomCar(370, -1, null, true), this.createRandomCar(450, 1, null, true), this.createRandomCar(520, -1, null, true), this.createRandomCar(590, -1, null, true) ];
+        }
+        else if (lvl === 4) { 
+            this.createRain(); this.cars = [ new Car(-200, 160, 9, 1, '#ef4444', false), new Car(1200, 240, 8, -1, '#38bdf8', false), new Car(-300, 320, 10, 1, '#facc15', true), new Car(1400, 400, 7, -1, '#a855f7', true), new Car(-200, 520, 9, 1, '#10b981', true), new Car(1200, 600, 8, -1, '#f97316', true) ];
+            this.obstacles = [ new Obstacle(400, 200, 110, 60, 'parking'), new Obstacle(570, 400, 100, 50, 'parking'), new Obstacle(480, 300, 80, 40, 'puddle') ]; 
+        }
+        else if (lvl === 5) {
+            this.createRain(); this.cars = [ new Car(-200, 150, 10, 1, '#ef4444', false), new Car(-400, 220, 9, 1, '#38bdf8', false), new Car(1200, 290, 8, -1, '#facc15', false), new Car(1400, 370, 9, -1, '#a855f7', true), new Car(-300, 450, 10, 1, '#10b981', true), new Car(1200, 520, 8, -1, '#f97316', true), new Car(1500, 590, 9, -1, '#cbd5e1', true) ];
             this.obstacles = [ new Obstacle(400, 180, 110, 50, 'parking'), new Obstacle(555, 320, 120, 50, 'parking'), new Obstacle(390, 500, 110, 50, 'parking'), new Obstacle(530, 250, 70, 40, 'puddle'), new Obstacle(480, 420, 70, 40, 'puddle') ]; 
-            this.isPlaying = true;
         }
 
         if (!this.loopStarted) { this.loopStarted = true; requestAnimationFrame((ts) => this.loop(ts)); }
@@ -407,64 +333,47 @@ class Game {
     restartLevel() { this.startLevel(this.level); }
     nextLevel() { if(this.level < this.maxLevel) this.startLevel(this.level + 1); else location.reload(); }
 
-    triggerGameOver() {
-        this.isPlaying = false; this.isDead = true; document.getElementById("death-overlay").style.display = "flex";
-        this.log("💀 發生意外...", "error", true);
-    }
-
     updateAILogic(dt) {
-        let dogCenter = this.dog.x + this.dog.w / 2;
+        let dogCenter = this.dog.x + 15;
         if (this.pedState === "RED") {
             if (this.dog.y > 685) return { x: (dogCenter < 533 ? 1.0 : (dogCenter > 537 ? -1.0 : 0)), y: -1.0 };
-            return { x: 0, y: 0 }; 
+            this.log("🐕 [AI] 紅燈停看聽，等待綠燈亮起...", "warn", false); return { x: 0, y: 0 }; 
         }
 
         for (let car of this.cars) {
             let distToPlayerX = (car.dir === 1) ? (this.dog.x - car.x) : (car.x - this.dog.x);
             let timeToCollision = distToPlayerX / ((car.currentSpeed * 60) + 0.1);
             if (car.violating && car.currentSpeed > 3 && timeToCollision > 0 && timeToCollision < 1.0 && this.dog.y > 130 && this.dog.y < 650) {
-                if (Math.abs((car.y + car.h/2) - (this.dog.y + this.dog.h/2)) < 80) {
-                    this.isEmergencyPullback = true; return { x: 0, y: 1.2 }; 
-                }
+                if (Math.abs((car.y + car.h/2) - (this.dog.y + 15)) < 80) { this.isEmergencyPullback = true; return { x: 0, y: 1.2 }; }
             }
             let inPathY = (this.dog.y > car.y - 15) && (this.dog.y < car.y + car.h + 20);
-            let inPathX = (this.dog.x + this.dog.w > car.x - 10) && (this.dog.x < car.x + car.w + 10);
-            if (inPathY && inPathX && car.currentSpeed > 1.5) return { x: 0, y: 0 }; 
+            let inPathX = (this.dog.x + 30 > car.x - 10) && (this.dog.x < car.x + car.w + 10);
+            if (inPathY && inPathX && car.currentSpeed > 1.5) { this.log("🐕 [AI] 偵測到橫向移動車輛，暫停等待...", "info", false); return { x: 0, y: 0 }; }
         }
 
-        let targetX = CONFIG.CROSSWALK_CENTER_X; 
-        let maxClearance = -1; let bestLanes = [];
+        let targetX = dogCenter; let maxClearance = -1; let bestLanes = [];
         for (let scanX = 450; scanX <= 620; scanX += 5) {
             let clearance = 9999;
             for (let obs of this.obstacles) {
                 if (obs.type !== 'parking') continue;
                 let distY = this.dog.y - (obs.y + obs.h);
-                if (distY > -30 && distY < 250) {
-                    if (scanX + 12 > obs.x && scanX - 12 < obs.x + obs.w) { if (distY < clearance) clearance = distY; }
-                }
+                if (distY > -30 && distY < 250) { if (scanX + 12 > obs.x && scanX - 12 < obs.x + obs.w) { if (distY < clearance) clearance = distY; } }
             }
             if (clearance > maxClearance) { maxClearance = clearance; bestLanes = [scanX]; }
             else if (clearance === maxClearance) { bestLanes.push(scanX); }
         }
-
         if (bestLanes.length > 0) {
             let isCenterSafe = bestLanes.some(l => Math.abs(l - 535) <= 5);
             if (isCenterSafe && maxClearance > 120) targetX = 535;
             else { bestLanes.sort((a, b) => Math.abs(a - dogCenter) - Math.abs(b - dogCenter)); targetX = bestLanes[0]; }
         }
 
-        let currentClearance = 9999;
-        for (let obs of this.obstacles) {
-            if (obs.type !== 'parking') continue;
-            let distY = this.dog.y - (obs.y + obs.h);
-            if (distY > -10 && distY < 200) {
-                if (dogCenter + 12 > obs.x && dogCenter - 12 < obs.x + obs.w) { if (distY < currentClearance) currentClearance = distY; }
-            }
-        }
+        let curClear = 9999;
+        for (let obs of this.obstacles) { if (obs.type === 'parking' && Math.abs(this.dog.y - (obs.y+obs.h)) < 200) { if (dogCenter + 12 > obs.x && dogCenter - 12 < obs.x + obs.w) curClear = Math.min(curClear, this.dog.y - (obs.y+obs.h)); } }
 
         if (this.dog.y > 15) {
             let moveX = (dogCenter < targetX - 2) ? 1.0 : (dogCenter > targetX + 2 ? -1.0 : 0);
-            let moveY = (Math.abs(dogCenter - targetX) > 3 && currentClearance < 45) ? 0 : -1.0;
+            let moveY = (Math.abs(dogCenter - targetX) > 3 && curClear < 45) ? 0 : -1.0;
             return { x: moveX, y: moveY }; 
         }
         return { x: 0, y: 0 }; 
@@ -482,19 +391,18 @@ class Game {
         else { this.cycleTimer = 0; }
 
         document.getElementById("ped-ui").className = `signal-light ped-${this.pedState.toLowerCase()}`;
-        document.getElementById("ped-ui").innerText = (this.pedState==="RED") ? "🔴" : "🟢";
+        document.getElementById("ped-ui").innerText = (this.pedState==="RED") ? "🔴 停止" : "🟢 通行";
         document.getElementById("car-ui").className = `signal-light car-${this.carState.toLowerCase()}`;
-        document.getElementById("car-ui").innerText = (this.carState==="GREEN")?"🟢": (this.carState==="YELLOW"?"🟡":"🔴");
+        document.getElementById("car-ui").innerText = (this.carState==="GREEN")?"🟢 通行": (this.carState==="YELLOW"?"🟡 減速":"🔴 煞車");
 
         let moveX = 0, moveY = 0;
-        if (this.autoPilot) {
-            let aiDecision = this.updateAILogic(dt); moveX = aiDecision.x; moveY = aiDecision.y;
-        } else {
+        if (this.autoPilot) { let aiDecision = this.updateAILogic(dt); moveX = aiDecision.x; moveY = aiDecision.y; }
+        else {
             if (this.keys["ArrowUp"] || this.keys["KeyW"]) moveY = -1;
             if (this.keys["ArrowDown"] || this.keys["KeyS"]) moveY = 1;
             if (this.keys["ArrowLeft"] || this.keys["KeyA"]) moveX = -1;
             if (this.keys["ArrowRight"] || this.keys["KeyD"]) moveX = 1;
-            if (moveY < 0 && this.pedState === "RED" && this.dog.y < 685) { this.log("🐕 紅燈停止！", "error", true); moveY = 0; }
+            if (moveY < 0 && this.pedState === "RED" && this.dog.y < 685) { this.log("🐕 現在是紅燈，拒絕進入車道！", "error", true); moveY = 0; }
         }
 
         let speedMul = (Math.abs((this.dog.x+15) - 535) < 40) ? 1.2 : 0.7; 
@@ -503,30 +411,19 @@ class Game {
         let actualSpeed = this.dog.speed * dt * speedMul;
         let nextX = this.dog.x + moveX * actualSpeed; let nextY = this.dog.y + moveY * actualSpeed;
         let canMoveX = true; let canMoveY = true;
-
-        this.obstacles.forEach(obs => {
-            if (obs.type === 'parking') {
-                if (nextX < obs.x+obs.w && nextX+30 > obs.x && this.dog.y+4 < obs.y+obs.h && this.dog.y+26 > obs.y) canMoveX = false;
-                if (this.dog.x+4 < obs.x+obs.w && this.dog.x+26 > obs.x && nextY < obs.y+obs.h && nextY+30 > obs.y) canMoveY = false;
-            }
-        });
+        this.obstacles.forEach(obs => { if (obs.type === 'parking') { if (nextX < obs.x+obs.w && nextX+30 > obs.x && this.dog.y+4 < obs.y+obs.h && this.dog.y+26 > obs.y) canMoveX = false; if (this.dog.x+4 < obs.x+obs.w && this.dog.x+26 > obs.x && nextY < obs.y+obs.h && nextY+30 > obs.y) canMoveY = false; } });
 
         if (canMoveX) this.dog.x = nextX; if (canMoveY) this.dog.y = nextY;
         this.dog.x = Math.max(10, Math.min(1060, this.dog.x)); this.dog.y = Math.max(10, Math.min(760, this.dog.y));
 
         let dx = this.dog.x - this.owner.x; let dy = (this.dog.y + 45) - this.owner.y; 
         let dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist > 10) {
-            let followS = (moveY > 0) ? CONFIG.OWNER_FOLLOW_SPEED * 1.8 : CONFIG.OWNER_FOLLOW_SPEED * speedMul;
-            this.owner.x += dx * followS * dt; this.owner.y += dy * followS * dt;
-        }
+        if (dist > 10) { let followS = (moveY > 0) ? CONFIG.OWNER_FOLLOW_SPEED * 1.8 : CONFIG.OWNER_FOLLOW_SPEED * speedMul; this.owner.x += dx * followS * dt; this.owner.y += dy * followS * dt; }
 
-        let ownerObj = new GameObject(this.owner.x, this.owner.y, 40, 40);
-        let dogObj = new GameObject(this.dog.x, this.dog.y, 30, 30);
         this.cars.forEach(car => {
             let isNearMiss = car.update(dt, this.carState, this.dog, this.owner);
-            if (isNearMiss) { this.stats.nearMisses++; this.log(`👻 極限擦彈！`, "info", false); }
-            if (car.isColliding(ownerObj) || car.isColliding(dogObj)) this.triggerGameOver();
+            if (isNearMiss) { this.stats.nearMisses++; this.log(`👻 極限擦彈！加分 (+800)`, "info", false); }
+            if (car.isColliding({x:this.owner.x, y:this.owner.y, w:40, h:40}) || car.isColliding({x:this.dog.x, y:this.dog.y, w:30, h:30})) { this.isPlaying = false; this.isDead = true; document.getElementById("death-overlay").style.display = "flex"; }
         });
 
         if (this.level >= 4) { this.rainParticles.forEach(p => { p.y += p.s; if(p.y > 800) p.y = -10; }); }
@@ -534,7 +431,7 @@ class Game {
         if (this.owner.y < CONFIG.FINISH_LINE && this.isPlaying && !this.isDead) {
             this.isPlaying = false;
             let timeUsed = (Date.now() - this.stats.startTime) / 1000;
-            document.getElementById("stat-time").innerText = timeUsed.toFixed(1) + "s";
+            document.getElementById("stat-time").innerText = timeUsed.toFixed(1);
             document.getElementById("stat-score").innerText = Math.floor(10000 - timeUsed*50 + this.stats.nearMisses*800);
             document.getElementById("win-overlay").style.display = "flex";
         }
@@ -548,22 +445,45 @@ class Game {
         this.ctx.fillStyle = "#eab308"; this.ctx.fillRect(517, 140, 36, 540);
         this.obstacles.forEach(obs => obs.draw(this.ctx));
         this.cars.forEach(car => car.draw(this.ctx));
-        this.ctx.strokeStyle = "#a1a1aa"; this.ctx.lineWidth = 4; this.ctx.beginPath();
-        this.ctx.moveTo(this.owner.x + 20, this.owner.y + 15); this.ctx.lineTo(this.dog.x + 15, this.dog.y + 20); this.ctx.stroke();
+        this.ctx.strokeStyle = "#a1a1aa"; this.ctx.lineWidth = 4; this.ctx.beginPath(); this.ctx.moveTo(this.owner.x + 20, this.owner.y + 15); this.ctx.lineTo(this.dog.x + 15, this.dog.y + 20); this.ctx.stroke();
 
+        // 🧑‍🦯 🐕 渲染
         this.ctx.font = "40px Arial"; this.ctx.fillText("🧑‍🦯", this.owner.x, this.owner.y + 35);
         this.ctx.font = "35px Arial"; this.ctx.fillText("🐕", this.dog.x, this.dog.y + 30);
 
+        // 💡 恢復：雷達虛線與標籤
+        let dogCx = this.dog.x + 15; let dogCy = this.dog.y + 15;
+        this.ctx.strokeStyle = "rgba(56, 189, 248, 0.4)"; this.ctx.lineWidth = 2;
+        this.ctx.beginPath(); this.ctx.arc(dogCx, dogCy, 250, 0, Math.PI * 2); this.ctx.stroke();
+
+        this.cars.forEach(car => {
+            let carCx = car.x + car.w/2; let carCy = car.y + car.h/2;
+            let dist = Math.sqrt((carCx - dogCx)**2 + (carCy - dogCy)**2);
+            if (dist <= 250 || this.isDead) {
+                this.ctx.strokeStyle = "rgba(56, 189, 248, 0.8)"; this.ctx.setLineDash([4, 4]);
+                this.ctx.beginPath(); this.ctx.moveTo(dogCx, dogCy); this.ctx.lineTo(carCx, carCy); this.ctx.stroke();
+                this.ctx.setLineDash([]);
+                let status = car.isYielding ? "🛑禮讓行人中" : (car.isPanicBraking ? "❗緊急煞車中" : "安全行駛中");
+                let color = car.isYielding ? "#10b981" : (car.isPanicBraking ? "#facc15" : "#38bdf8");
+                this.ctx.fillStyle = "rgba(15, 23, 42, 0.85)"; this.ctx.fillRect(carCx - 45, carCy - 30, 100, 22);
+                this.ctx.fillStyle = color; this.ctx.font = "bold 12px '微軟正黑體'"; this.ctx.fillText(status, carCx - 40, carCy - 15);
+            }
+        });
+
+        // 雨天效果回歸
         if (this.level >= 2) {
             this.ctx.fillStyle = (this.level===5)?"rgba(0,0,0,0.96)":"rgba(15,23,42,0.7)";
             this.ctx.fillRect(0,0,1100,800);
-            if (this.level >= 4 && !this.isDead) {
+            if (this.level >= 4) {
+                this.ctx.strokeStyle = "rgba(255, 255, 255, 0.4)"; this.ctx.lineWidth = 1; this.ctx.beginPath();
+                this.rainParticles.forEach(p => { this.ctx.moveTo(p.x, p.y); this.ctx.lineTo(p.x - 2, p.y + p.l); }); this.ctx.stroke();
                 this.ctx.save(); this.ctx.globalCompositeOperation = "destination-out";
-                let grad = this.ctx.createRadialGradient(this.dog.x+15, this.dog.y+15, 30, this.dog.x+15, this.dog.y+15, 150);
+                let grad = this.ctx.createRadialGradient(dogCx, dogCy, 30, dogCx, dogCy, 150);
                 grad.addColorStop(0, "rgba(255,255,255,1)"); grad.addColorStop(1, "rgba(255,255,255,0)");
-                this.ctx.fillStyle = grad; this.ctx.beginPath(); this.ctx.arc(this.dog.x+15, this.dog.y+15, 150, 0, Math.PI*2); this.ctx.fill(); this.ctx.restore();
+                this.ctx.fillStyle = grad; this.ctx.beginPath(); this.ctx.arc(dogCx, dogCy, 150, 0, Math.PI*2); this.ctx.fill(); this.ctx.restore();
             }
         }
+        if (this.isEmergencyPullback) { this.ctx.fillStyle = "rgba(239, 68, 68, 0.3)"; this.ctx.fillRect(0, 0, 1100, 800); }
     }
 
     loop(timestamp) {
