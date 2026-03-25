@@ -60,7 +60,6 @@
         /* ================= 虛擬搖桿 (Mobile 專用) ================= */
         #virtual-joystick { 
             display: none; flex-direction: column; align-items: center; margin-top: 10px; gap: 5px; 
-            /* 徹底防止搖桿區塊的預設觸控行為 (滑動、雙擊放大等) */
             touch-action: none; 
             -webkit-touch-callout: none;
         }
@@ -70,20 +69,17 @@
             border-radius: 15px; font-size: 28px; color: white; display: flex; justify-content: center; 
             align-items: center; cursor: pointer; transition: background 0.1s; 
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            /* 確保按鈕本身不會被選取或反藍 */
             -webkit-user-select: none; user-select: none; 
             -webkit-tap-highlight-color: transparent;
         }
         .dbtn:active, .dbtn.active { background: #3b82f6; border-color: #60a5fa; transform: scale(0.92); }
         
-        /* 當螢幕寬度小於 900px 時，顯示虛擬搖桿並微調排版 */
         @media (max-width: 900px) {
             #virtual-joystick { display: flex; }
             h1 { font-size: 1.3rem; margin-bottom: 2px;}
             p { font-size: 0.85rem; margin-bottom: 5px;}
             #dashboard { flex-direction: column; align-items: center; border-radius: 10px 10px 0 0; padding: 8px;}
             #ai-log { width: 100%; text-align: center; }
-            /* 手機版將畫布稍微縮小，留出更多空間給搖桿 */
             canvas { max-height: 50vh; }
         }
     </style>
@@ -408,7 +404,6 @@ class Game {
             this.cycleTimer = 0; this.autoPilot = false; this.puddleLogTriggered = false;
             this.isDead = false; 
             this.keys = {}; 
-            // 確保搖桿視覺狀態重置
             document.querySelectorAll('.dbtn').forEach(btn => btn.classList.remove('active'));
 
             this.stats = { startTime: Date.now(), nearMisses: 0, useAiTime: 0 }; 
@@ -541,16 +536,13 @@ class Game {
         let dogCenter = this.dog.x + this.dog.w / 2;
         let targetX = CONFIG.CROSSWALK_CENTER_X; 
 
-        if (this.pedState === "RED") {
-            if (this.dog.y > 685) {
-                let moveX = 0;
-                if (dogCenter < targetX - 2) moveX = 1.0; 
-                else if (dogCenter > targetX + 2) moveX = -1.0;
-                return { x: moveX, y: -1.0 }; 
-            } else {
-                this.log("🐕 [AI] 紅燈停看聽，等待綠燈亮起...", "warn", false);
-                return { x: 0, y: 0 }; 
-            }
+        // 🌟 修正 AI 邏輯：如果在起點安全區，才遵守紅燈停看聽
+        if (this.pedState === "RED" && this.dog.y >= 680) {
+            let moveX = 0;
+            if (dogCenter < targetX - 2) moveX = 1.0; 
+            else if (dogCenter > targetX + 2) moveX = -1.0;
+            this.log("🐕 [AI] 紅燈停看聽，等待綠燈亮起...", "warn", false);
+            return { x: moveX, y: 0 }; // 確保 Y 軸不移動 (不會卡死，也不會闖紅燈)
         }
 
         for (let car of this.cars) {
@@ -662,7 +654,8 @@ class Game {
             if (this.keys["ArrowLeft"] || this.keys["KeyA"]) moveX = -1;
             if (this.keys["ArrowRight"] || this.keys["KeyD"]) moveX = 1;
 
-            if (moveY < 0 && this.pedState === "RED" && this.dog.y < 685) {
+            // 🌟 修正手動邏輯：只有在起點安全區 (y >= 680)，紅燈時才拒絕進入車道
+            if (moveY < 0 && this.pedState === "RED" && this.dog.y >= 680) {
                 this.log("🐕 [智慧違抗] 現在是紅燈，拒絕進入車道！", "error", true);
                 moveY = 0; 
             }
